@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>login</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <div>
+        <h2>login</h2>
+    </div>
+    <div>
+        <form action="{{ url_for('login') }}" method="post" enctype="multipart/form-data">
+            <input type="text" name="username" placeholder="username"/>
+            <br>
+            <input type="password" name="password" placeholder="password"/>
+            <br>
+            <input type="submit" value="login"/>
+        </form>
+    </div>
+</body>
+</html>

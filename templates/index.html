@@ -6,14 +6,20 @@
     }
   </style>
 
+<head>
+  <link rel="icon" type="image/x-icon" href="favicon.ico"/> 
+  <title> NJ2</title>
+</head>
 
 <body>
-  <h1>Some famous Computer Scientists</h1>
-  <div>{{data}}</div>
+  <h1>Hello {{name}}</h1>
+  <a href="{{ url_for('password') }}">Change Password</a>&emsp;
+  <a href="{{ url_for('logout') }}">Logout</a>
 
   <div>
-    {% for n in data %}
-    <div>{{n}}</div>
+    <h3>View your Cart</h3>
+    {% for account in accounts %}
+    <h4>{{ account[1] }} account <a href="{{ url_for('account', account_number = account[0]) }}">{{ account[0] }}</a></h4>
     {% endfor %}
   </div>
 
