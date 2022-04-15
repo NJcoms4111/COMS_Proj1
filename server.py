@@ -1,4 +1,3 @@
-#!/usr/bin/env python2.7
 
 """
 Columbia W4111 Intro to databases
@@ -11,12 +10,18 @@ Read about it online.
 """
 
 import os
+  # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response
+from flask import Flask, request, render_template, g, redirect, Response, session, abort, url_for, flash
+from random import randint
+from datetime import datetime, timezone
 
+from sqlalchemy.sql.functions import user
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
+#app.secret_key = ("b'\xa1\xac9\x1f\xfa\x9a\xa9\xc4\xb5c\xdcr\xb0'" +
+#                           "b'\x96\xdc\xfb\xf5B\xd7\x0e\x17.\xe7'")
 
 
 
@@ -34,8 +39,8 @@ app = Flask(__name__, template_folder=tmpl_dir)
 DB_USER = "jvp2118"
 DB_PASSWORD = "8260"
 
-DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
-
+#DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
+DB_SERVER = "w4111project1part2db.cisxo09blonu.us-east-1.rds.amazonaws.com"
 DATABASEURI = "postgresql://"+DB_USER+":"+DB_PASSWORD+"@"+DB_SERVER+"/proj1part2"
 
 
@@ -106,8 +111,22 @@ def index():
   """
 
   # DEBUG: this is debugging code to see what request looks like
-  print (request.args)
+  #print (request.args)
 
+  # check if user is logged in
+  if 'logname' not in session:
+    return redirect(url_for('login'))
+  
+  cursor = g.conn
+  # Get the real name of the logged in user
+  name = cursor.execute("""
+    SELECT users.name
+    FROM users
+    WHERE username = %(username)s;
+    """, {
+      'username': session['logname']
+    })
+  name = name.fetchone()[0]
 
   #
   # example of a database query
@@ -165,6 +184,72 @@ def index():
 def another():
   return render_template("anotherfile.html")
 
+# Password page
+@app.route('/password', methods=['GET', 'POST'])
+def password():
+  if 'logname' not in session:
+    return redirect(url_for('index'))
+  if request.method == 'POST':
+    old_password = request.form['old_password']
+    new_password = request.form['new_password']
+    cursor = g.conn
+    exists = cursor.execute("""
+    SELECT users.username AS username FROM users
+    WHERE username = %(username)s
+    AND password = %(password)s;
+    """, {
+      'username': session['logname'],
+      'password': old_password
+    })
+    exists = exists.fetchall()
+    # Throw error 403 if no such username/password combination
+    if not exists:
+      cursor.close()
+      abort(403)
+    
+    cursor.execute("""
+    UPDATE users
+    SET password = %(password)s
+    WHERE username = %(username)s;
+    """, {
+      'password': new_password,
+      'username': session['logname']
+    })
+    return redirect(url_for('index'))
+  return render_template("password.html")
+  
+
+# Login page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+  if 'logname' in session:
+    return redirect(url_for('index'))
+  
+  # Check whether username/password combination can be found
+  if request.method == 'POST':
+    exists = None
+    input_username = request.form['username']
+    input_password = request.form['password']
+    cursor = g.conn
+    exists = cursor.execute("""
+    SELECT users.username AS username FROM users
+    WHERE username = %(username)s
+    AND password = %(password)s;
+    """, {
+      'username': input_username,
+      'password': input_password
+    })
+    exists = exists.fetchall()
+    # Throw error 403 if no such username/password combination
+    if not exists:
+      cursor.close()
+      abort(403)
+    
+    # Create cookie if log in is successful
+    session['logname'] = input_username
+    cursor.close()
+    return redirect(url_for('index'))
+  return render_template("login.html")
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
@@ -176,10 +261,11 @@ def add():
   return redirect('/')
 
 
-@app.route('/login')
-def login():
-    abort(401)
-    this_is_never_executed()
+# Lougout
+@app.route('/logout/', methods=['POST'])
+def logout():
+  session.clear()
+  return redirect(url_for('login'))
 
 
 if __name__ == "__main__":
