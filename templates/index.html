@@ -12,23 +12,18 @@
 </head>
 
 <body>
-  <h1>Hello {{name}}</h1>
-  <a href="{{ url_for('password') }}">Change Password</a>&emsp;
-  <a href="{{ url_for('logout') }}">Logout</a>
+    <h1>Hello {{data[0]}}</h1>
+    <h3>Profile changes</h3>
+    <a href="{{ url_for('password') }}">Change Password</a>&emsp;
+    <a href="{{ url_for('logout') }}">Logout</a>
+    <h3>Browse</h3>
+    <a href="{{ url_for('cart') }}">View your cart</a>&emsp;
+    <a href="{{ url_for('browse_items') }}">Browse Items</a>&emsp;
+    <a href="{{ url_for('bought_item') }}">Bought Items</a>
 
-  <div>
-    <h3>View your Cart</h3>
-    {% for account in accounts %}
-    <h4>{{ account[1] }} account <a href="{{ url_for('account', account_number = account[0]) }}">{{ account[0] }}</a></h4>
-    {% endfor %}
-  </div>
-
-<p><a href="/another">Go to the other page</a></p>
-
-<form method="POST" action="/add">
-<p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>
-</form>
-
+    <h3>Manage Items you are selling(Sign up with sid to access)</h3>
+    <a href="{{ url_for('sellitems') }}">Sell Items</a>&emsp;
+    <a href="{{ url_for('solditems') }}">Sold Items</a>&emsp;
 </body>
 
 

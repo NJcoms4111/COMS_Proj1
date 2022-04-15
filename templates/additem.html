@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>login</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <div>
+        <h2>login</h2>
+    </div>
+    <div>
+        <form action="{{ url_for('additem') }}" method="post" enctype="multipart/form-data">
+            <input type="text" name="name" placeholder="name" />
+            <br>
+            <input type="number" name="price" placeholder="price" />
+            <br>
+            <h3>Restrict entering condition to the following set (Like New, Good, Fair, Bad)</h3>
+            <input type="text" name="condition" placeholder="condition" />
+            <br>
+            <input type="submit" value="additem" />
+        </form>
+    </div>
+</body>
+</html>

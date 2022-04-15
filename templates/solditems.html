@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    body {
+        font-size: 15pt;
+        font-family: arial;
+    }
+</style>
+
+<body>
+    <h1>Items sold by you</h1>
+    {% for item in sold_data %}
+    <h4>Item name : {{item[0]}}</a></h4>
+    <h4>Item Price : {{item[1]}}</a></h4>
+    <h4>Item Condition : {{item[2]}}</a></h4>
+    {% endfor %}
+</body>
+</html>
